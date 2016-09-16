@@ -275,7 +275,7 @@ public class DirectoryWatcher {
 
     for (String sub : subs) {
       if (appendDelimiter) {
-        pattern.append(File.separator);
+        pattern.append("[/|\\\\]");
       } else {
         appendDelimiter = true;
       }
@@ -287,7 +287,7 @@ public class DirectoryWatcher {
         pattern.append(sub
           .replace(".", "\\.")
           .replace("?", ".")
-          .replace("*", "[^" + File.separator + "]*?")
+          .replace("*", "[^/|\\\\]*?")
           );
       }
     }
@@ -295,7 +295,7 @@ public class DirectoryWatcher {
     pattern.append("$");
     return Pattern.compile(pattern.toString());
   }
-
+  
   /* Filter Checking */
   public boolean shouldTrack(Path path) {
     return shouldTrack(path.toString());

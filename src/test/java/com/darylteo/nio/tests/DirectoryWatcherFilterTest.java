@@ -239,4 +239,15 @@ public class DirectoryWatcherFilterTest {
     assertFalse(watcher.shouldTrack(Paths.get("foo/file.json")));
     assertFalse(watcher.shouldTrack(Paths.get("foo/bar/file.json")));
   }
+  
+  @Test
+  public void testWindows() throws InterruptedException, IOException {
+    watcher.exclude("foo\\**");
+
+    assertTrue(watcher.shouldTrack(Paths.get("file")));
+    assertTrue(watcher.shouldTrack(Paths.get("file.json")));
+    assertFalse(watcher.shouldTrack(Paths.get("foo\\file")));
+    assertFalse(watcher.shouldTrack(Paths.get("foo\\file.json")));
+    assertFalse(watcher.shouldTrack(Paths.get("foo\\bar\\file.json")));
+  }
 }
