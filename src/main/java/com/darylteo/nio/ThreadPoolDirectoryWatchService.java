@@ -2,8 +2,11 @@ package com.darylteo.nio;
 
 import java.io.IOException;
 import java.nio.file.ClosedWatchServiceException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <p>
@@ -16,7 +19,9 @@ import java.util.concurrent.Executors;
  * @see DirectoryWatcher
  */
 public class ThreadPoolDirectoryWatchService extends AbstractDirectoryWatchService {
+  
   private final ExecutorService executorService = Executors.newCachedThreadPool();
+  private final List<WatcherThread> watcherThreads = new ArrayList<>();
 
   /**
    * <p>
@@ -40,7 +45,9 @@ public class ThreadPoolDirectoryWatchService extends AbstractDirectoryWatchServi
    */
   public ThreadPoolDirectoryWatchService(int threadCount) throws IOException {
     for (int i = 0; i < threadCount; i++) {
-      executorService.execute(new WatcherThread());
+      WatcherThread thread = new WatcherThread();
+      watcherThreads.add(thread);
+      executorService.execute(thread);
     }
   }
 
@@ -48,9 +55,18 @@ public class ThreadPoolDirectoryWatchService extends AbstractDirectoryWatchServi
    * Thread responsible for the watching logic
    */
   private class WatcherThread implements Runnable {
+	
+	private AtomicBoolean stop = new AtomicBoolean(false);
+	
+	public WatcherThread() {}
+	
+	public void setStop(boolean stop) {
+		this.stop.set(stop);
+	}
+	
     @Override
     public void run() {
-      while (true) {
+      while (!stop.get()) {
         try {
           ThreadPoolDirectoryWatchService.super.handleWatchKey(ThreadPoolDirectoryWatchService.super.getWatchService().take());
         } catch (InterruptedException | ClosedWatchServiceException e) {
@@ -62,7 +78,10 @@ public class ThreadPoolDirectoryWatchService extends AbstractDirectoryWatchServi
   
   @Override
   public void close() throws Exception {
-    executorService.shutdownNow();
     super.close();
+    executorService.shutdownNow();
+	for (WatcherThread thread : watcherThreads) {
+		thread.setStop(true);
+	}
   }
 }
