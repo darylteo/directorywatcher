@@ -313,7 +313,7 @@ public class DirectoryWatcher {
   }
 
   /* Handlers */
-  void handleCreateEvent(WatchKey key, Path path) {
+  void handleCreateEvent(WatchKey key, Path path) throws IOException {
     if (!isTrackingKey(key)) {
       return;
     }
@@ -347,6 +347,8 @@ public class DirectoryWatcher {
         Files.walkFileTree(path, visitor);
       } catch (IOException e) {
       }
+    } else {
+      entryCreated(path);
     }
   }
 

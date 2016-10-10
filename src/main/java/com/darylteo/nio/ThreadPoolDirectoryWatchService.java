@@ -69,7 +69,7 @@ public class ThreadPoolDirectoryWatchService extends AbstractDirectoryWatchServi
       while (!stop.get()) {
         try {
           ThreadPoolDirectoryWatchService.super.handleWatchKey(ThreadPoolDirectoryWatchService.super.getWatchService().take());
-        } catch (InterruptedException | ClosedWatchServiceException e) {
+        } catch (InterruptedException | ClosedWatchServiceException | IOException e) {
           return;
         }
       }

@@ -101,7 +101,7 @@ public abstract class AbstractDirectoryWatchService implements AutoCloseable, Di
     this.watchers.add(watcher);
   }
 
-  protected void handleWatchKey(WatchKey key) {
+  protected void handleWatchKey(WatchKey key) throws IOException {
     if (key == null) {
       return;
     }
