@@ -19,8 +19,9 @@ public class PollingDirectoryWatchService extends AbstractDirectoryWatchService 
 
   /**
    * Notifies all subscribers or any file system changes (if any)
+ * @throws IOException 
    */
-  public void poll() {
+  public void poll() throws IOException {
     super.handleWatchKey(super.getWatchService().poll());
   }
 }
